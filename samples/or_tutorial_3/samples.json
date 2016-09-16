@@ -1,0 +1,17 @@
+{
+  "name": "or_tutorial_3",
+  "category": "RealSense SDK",
+  "tag": "realsense",
+  "description": "This console app builds on top of or_tutorial_2, and illustrates how to add the libOR object tracking functionality with localization and 3d localization. Objects for tracking can be as small as 1% of the screen.",
+  "author": "Intel Corporation",
+  "date": "2016-09-01",
+  "main": "main.cpp",
+  "platform": {
+    "hwreq": [
+      "ZR300"
+    ],
+    "libs": []
+  },
+  "cxxflags": "--std=c++11 -pthread -fPIC -std=c++0x -I/usr/include/librealsense -I/usr/include/librealsense/object_recognition",
+  "ldflags": "-lrs_projection -lrs_image -lrs_playback -lrs_record -lrs_log_utils -lrealsense -lpthread -lobject_recognition -lopencv_highgui -lopencv_imgproc -lopencv_core"
+}

@@ -1,0 +1,17 @@
+{
+  "name": "slam_tutorial_1",
+  "category": "RealSense SDK",
+  "tag": "realsense",
+  "description": "This console app illustrates the use of libRealsense and libSLam libraries to use the ZR300 camera's depth, fish eye, and IMU sensors to print out the current camera module position and pose."
+  "author": "Intel Corporation",
+  "date": "2016-09-01",
+  "main": "main.cpp",
+  "platform": {
+    "hwreq": [
+      "ZR300"
+    ],
+    "libs": []
+  },
+  "cxxflags": "--std=c++11 -pthread -fPIC -std=c++0x -I/usr/include/librealsense -I/usr/include/librealsense/slam",
+  "ldflags": "-lrs_projection -lrs_image -lrs_playback -lrs_record -lrs_log_utils -lrealsense -lpthread -lrealsense_slam -lSP_Core -ltracker -lopencv_imgproc -lopencv_core"
+}
