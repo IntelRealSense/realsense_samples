@@ -2,11 +2,11 @@
 
 #pt_tutorial_1
 
-This console app illustrates the use of libRealsense, realsense_persontracking, and the Linux SDK Framework to use the RealSense camera's depth and color sensors to detect people in the scene. The number of people detected in the current frame as well as cumulative total number of people will be displayed as a quantity on the console
+This sample app illustrates the use of Intel® RealSense™ Cross Platform API, Intel RealSense SDK for Linux Person Library, and the Linux SDK Framework to use the ZR300 camera's depth and color sensors to detect people in the scene. The number of people detected in the scene will be displayed as a quantity on the console.
 
 # Sample output
 
-When running pt_tuturial_1 sample, the number of persons detected in the current frame will be printed on console along with the cumulative total:
+When running the pt_tutorial_1 sample, the number of persons detected in the current frame will be printed on the console along with the cumulative total.
 
 ```
 Current Frame Total      Cumulative
@@ -18,9 +18,22 @@ Current Frame Total      Cumulative
 1                        1
 ```
 
+
+# Steps to execute
+
+Type the following command at the command prompt to execute this sample:
+
+
+```bash
+$ rs_pt_tutorial_1
+```
+
+**Note:** If you are building this sample from source, the executable name is, instead, sample_pt_tutorial_1.
+
+
 #License
 
-Copyright 2016 Intel Corporation
+Copyright 2017 Intel Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at
 

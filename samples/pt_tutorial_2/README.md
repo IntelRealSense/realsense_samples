@@ -1,12 +1,10 @@
-
-
 #pt_tutorial_2
 
-This sample app illustrates how to analyze someone’s posture. When a person is in the FOV, the app should display the following information: his head pose info (yaw, pitch, roll values) and his body  orientation (front/side/back values).
+This sample app demonstrates how to analyze someone’s posture. When a person is in the field of view (FOV), the app should display the following information once every second: head direction (yaw, pitch, roll values).
 
 # Sample output
 
-When running pt_tuturial_2 sample, head pose values (yaw, pitch, roll) and person orientation with confidence score will be printed on the console continuously:
+When running the pt_tutorial_2 sample, person ID (PID), and head pose values (yaw, pitch, roll) will be printed on the console continuously.
 
 ```
 PID: 0, head pose (pitch, roll, yaw) (-7.50198, -11.7497, 1.65109)
@@ -18,9 +16,20 @@ PID: 0, head pose (pitch, roll, yaw) (-7.16278, -12.8903, 1.13986)
 PID: 0, head pose (pitch, roll, yaw) (-7.34624, -14.0557, -0.528061)
 ```
 
+# Steps to execute
+
+Type the following command at the command prompt to execute this sample:
+
+
+```bash
+$ rs_pt_tutorial_2
+```
+
+**Note:** If you are building this sample from source, the executable name is, instead, sample_pt_tutorial_2.
+
 #License
 
-Copyright 2016 Intel Corporation
+Copyright 2017 Intel Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at
 

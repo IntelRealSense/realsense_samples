@@ -1,0 +1,1 @@
+cmd='/usr/bin/cmake;-GUnix Makefiles;/home/msteinx/Projects/GT-Sample-Apps/samples/ScenePerception/src/ui/seasocks/src/seasocks_lib'

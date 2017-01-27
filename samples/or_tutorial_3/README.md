@@ -1,12 +1,12 @@
 # or_tutorial_3
 
-This console app builds on top of or_tutorial_2, and illustrates how to add the libOR object tracking functionality with localization and 3d localization. Objects for tracking can be as small as 1% of the screen
+This console app builds on or_tutorial_2, and illustrates how to add the object tracking functionality of Intel RealSense SDK for Linux Object Library with localization and 3D localization. Objects for tracking can be as small as 1% of the screen.
 
 # Sample output
 
-When running or_tuturial_3 sample, the object localization and tracking result will be printed  on console continuously.
+When running the or_tutorial_3 sample, the object localization and tracking results will be printed on the console continuously.
 
-First localization result comes out with objects' label name, recognition confidence value, center and coordinates, and then sample will track these localized objects and print out their label and new coordinates:
+First, the localization result is displayed with object label name, recognition confidence value, center, and coordinates. Then, the sample will track these localized objects and print out their label and new coordinates
 
 
 ```
@@ -32,9 +32,20 @@ monitor           (399,-26) (1222,561)
 chair             (998,352) (1635,1022)
 ```
 
+# Steps to execute
+
+
+Type the following command at the command prompt to execute this sample:
+
+```bash
+$ rs_or_tutorial_3
+```
+**Note:** If you are building this sample from source, the executable name is, instead, sample_or_tutorial_3.
+
+
 #License
 
-Copyright 2016 Intel Corporation
+Copyright 2017 Intel Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at
 

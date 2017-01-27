@@ -1,32 +1,39 @@
 cmake_minimum_required (VERSION 2.8.9)
-project(sample_or_tutorial_1)
+project(${SAMPLE_PREFIX}or_tutorial_1)
+
+# set path
+set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../common)
+set(CONSOLE_DISPLAY_DIR ${COMMON_DIR}/console_display)
+set(COMMON_UTILS_DIR ${COMMON_DIR}/utils)
 
 set(OPENCV_LIBRARIES opencv_highgui opencv_imgproc opencv_core)
-set(RS_SDK_LIBRARIES rs_projection rs_image rs_playback rs_record rs_log_utils)
+set(RS_SDK_LIBRARIES realsense_projection realsense_image realsense_playback realsense_record realsense_log_utils)
 set(PROJECT_LINK_LIBS
     ${RS_SDK_LIBRARIES}
     realsense
     pthread
-    object_recognition
+    realsense_object_recognition
     ${OPENCV_LIBRARIES}
 )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11 -pthread -fPIC -std=c++0x")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -fmessage-length=0 --std=c++11 -pthread -fPIC -std=c++0x -fexceptions -frtti -ffunction-sections -fdata-sections")
 
 set(SOURCES
     cpp/main.cpp
-    cpp/camera_utils.cpp
-    cpp/console_view.cpp
 )
 
 include_directories(
-    cpp 
-    ${SYSROOT}/usr/include
-    ${SYSROOT}/usr/include/librealsense 
-    ${SYSROOT}/usr/include/librealsense/object_recognition)
+    /usr/include
+    /usr/include/librealsense
+    /usr/include/librealsense/object_recognition
+    ${CONSOLE_DISPLAY_DIR}
+    ${COMMON_UTILS_DIR}
+)
 
 link_directories(
-    ${SYSROOT}/usr/lib)
+    /usr/lib
+    /usr/local/lib
+)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

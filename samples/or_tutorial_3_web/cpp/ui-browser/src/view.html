@@ -1,0 +1,207 @@
+<!-- License: Apache 2.0. See LICENSE file in root directory.
+     Copyright(c) 2016 Intel Corporation. All Rights Reserved. -->
+<!doctype html>
+<html>
+
+<head>
+    <meta charset=utf-8>
+    <title>OR_Tutorial_3_Web</title>
+    <script>
+        if ('ontouchstart' in window || (window.DocumentTouch && document instanceof DocumentTouch)) {
+            document.documentElement.className += ' touchScreen';
+        }
+    </script>
+    <style>
+        #poseview {
+            margin-top: 1em;
+            width: 100%;
+        }
+        #container { 
+            position: relative;
+        }
+
+        #color-canvas, #color-2d-overlay {
+            position: absolute;     <!-- Absolute so we can force both canvases to same location -->
+            top: 0px; 
+            left: 0px;
+        }
+        #color-canvas{
+            z-index: 0;
+        }
+        #color-2d-overlay {
+            z-index: 1;
+        }
+        #recognizedObjectList {
+            width: 517px;
+        }
+        .content {
+            color:#2B60DE; 
+            font-size:60px; 
+            font-weight:bold; 
+            font-style:italic; 
+            font-family: Arial Black, Times New Roman; 
+            text-align: center;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box; /* in case block elements are used inside table cells */
+        }
+        html {
+            font-size: 62.5%; /* standardizes older IEs */
+        }
+        body {
+            font: normal 1.3em Verdana; /* = 13px */
+        }
+        table {
+            border: 1px solid black;
+            border-collapse: collapse;
+            table-layout: fixed;
+            empty-cells: show;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 4px;
+        }
+
+        td {
+            color: #000000;
+        }
+        
+        /* SCROLL TABLE */
+        div#scrollTableContainer {
+            width: 617px;
+            border: 1px solid black;
+        }
+        .touchScreen div#scrollTableContainer {
+            width: 500px; /* touch devices do not form scrollbars (= 17 px wide) */
+        }
+        #tHeadContainer {
+            background: #3b9cf8;
+            color: #FFFFFF;
+            font-weight: bold;
+        }
+        #tBodyContainer {
+            height: 275px;
+            overflow-y: scroll;
+        }
+        .touchScreen #tBodyContainer {
+            -webkit-overflow-scrolling: touch; /* smooths scrolling on touch screens */
+        }
+        /* FINER LAYOUT MATTERS: */
+        tr:first-child td {
+            border-top: 0px;
+        }
+        #tBody tr.lastRow td {
+            border-bottom: 0px;
+        }
+    
+    	th:first-child, td:first-child {
+			width: 140px;
+			min-width: 140px;
+        		border-left: 0px;
+    	}
+    	th:first-child + th, td:first-child + td {
+                        width: 150px;
+                        min-width: 150px;
+    	}
+    	th:first-child + th + th, td:first-child + td + td {
+                        width: 200px;
+    	}
+
+        /* AND SOME CSS TO INFORM TOUCH SCREEN USERS */
+        p#touchDeviceText {
+            display: none;
+        }
+        .touchScreen p#touchDeviceText {
+            display: block;
+        }
+
+        .column_right, .column_left {
+            width: 640px;
+            min-width: 640px;
+            min-height: 520px;
+            margin: 20px;
+            padding: 0;
+        } 
+        .controls {
+            position: relative;
+        }
+        .level {
+            position: relative;
+            top: 490px;
+            width: 100%;
+        }
+        
+    </style>
+    <link rel="stylesheet" href="css/bulma.css" />
+    <script src="js/third_party/vue.js"></script>
+</head>
+
+<body>
+    <div class="container" id="poseview">
+        <div class="columns">
+
+            <div class="column_left">
+                <!-- color canvas -->
+                <div class="controls">
+                    <canvas id="color-canvas" width=640 height=480></canvas>
+                    <canvas id="color-2d-overlay" width=640 height=480></canvas> 
+                </div> 
+                
+                <!-- Status and disconect button -->
+                <div class="level"> 
+                    <span>Server: {{wsurl? wsurl : 'Disconnected'}}</span>
+                                        <button class="button is-danger" id="tButtonName" v-on:click="check">Stop</button>
+                                <!--    <button class="button is-danger" disabled="{{!isConnected}}" v-on:click="stop">Pause</button> -->
+                </div>
+            </div> 
+
+            <!-- Table of recognized things -->
+            <div class="column_right">
+                <p id="touchDeviceText">This table is scrollable</p>
+                <div id="scrollTableContainer">
+                    <div id="tHeadContainer">
+                        <table id="tHead">
+                            <tr>
+                                <th>Time Stamp</th>
+                                <th>Label</th>
+                                <th>Coordinates</th>
+                            </tr>
+                        </table>
+                    </div> <!-- tHeadContainer -->
+                    <div id="tBodyContainer">
+                        <table id="tBody">
+                            <!-- table rows will go here -->
+                        </table>
+                    </div> <!-- tBodyContainer -->
+                </div> <!-- scrollTableContainer -->
+                <div id="labelList">
+				<br /><p id="recognizedObjectListTitle"><b>List of recognizable objects:</b></p>
+		</div>
+	    </div>
+         </div>
+    </div>
+        <div class="modal is-active" id="modal">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                 <div class="box">
+                      <div class="content">
+                           <p> Loading ... </p>
+                      </div>
+                 </div>
+            </div>
+
+        </div>
+
+
+    <script src="js/third_party/Stats.js"></script>
+    <script src="js/third_party/jpg.js"></script>
+    <script src="js/third_party/three.js"></script>
+    <script src="js/third_party/TrackballControls.js"></script>
+    <script src="js/buffer_view.js"></script>
+    <script src="js/transport.js"></script>
+    <script src="js/view.js"></script>
+</body>
+</html>

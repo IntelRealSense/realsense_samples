@@ -1,0 +1,7 @@
+{
+  "version": false,
+  "dependencies": {},
+  "globalDependencies": {
+    "three": "registry:dt/three#0.0.0+20160627210315"
+  }
+}

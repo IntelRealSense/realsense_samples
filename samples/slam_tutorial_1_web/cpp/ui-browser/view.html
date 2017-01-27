@@ -1,0 +1,156 @@
+<!-- License: Apache 2.0. See LICENSE file in root directory.
+     Copyright(c) 2016 Intel Corporation. All Rights Reserved. -->
+<!doctype html>
+<html>
+
+<head>
+	<meta charset=utf-8>
+	<title>SLAM</title>
+	<style>
+		#poseview {
+			margin-top: 1em;
+		}
+		#fisheye-canvas {
+			width: 320px;
+			height: 240px;
+		}
+
+		.column.main {
+			width: 700px;
+		}
+		.controls {
+			position: relative;
+		}
+		.view-controls {
+			position: absolute;
+			z-index: 1000;
+			top: 1em;
+			right: 10px;
+		}
+		.tracking-controls {
+			width: 100%;
+			position: absolute;
+			bottom: 0;
+			padding: 10pt 10pt;
+		}
+		.pose {
+			font-size: 80%;
+		}
+
+		.pose > b {
+			/*border: 1px solid red;*/
+			display: inline-block;
+			width: 3.5em;
+			margin-left: 6pt;
+			overflow: hidden;
+			text-align: right;
+		}
+		.pose > .tracking {
+			width: 5em
+		}
+		.tracking.na {
+			color: rgba(0,0,0,0.5);
+		}
+		.tracking.fail {
+			color: #d32f2f;
+		}
+		.tracking.low {
+			color: #FFA000;
+		}
+		.tracking.medium {
+			color: #AFB42B;
+		}
+		.tracking.high {
+			color: #388E3C;
+		}
+                /*.content {
+                        color:#2B60DE;
+                        font-size:60px;
+                        font-weight:bold;
+                        font-style:italic;
+                        font-family: Arial Black, Times New Roman;
+                        text-align: center;
+                 }*/
+	</style>
+	<link rel="stylesheet" href="css/bulma.css" />
+	<script src="js/third_party/vue.js"></script>
+</head>
+
+<body>
+	<div class="container" id="poseview">
+		<div class="columns">
+			<!-- Main canvas -->
+			<div class="column main">
+				<div class="controls">
+					<canvas id="tracking-canvas" width=600 height=500></canvas>
+
+					<p class="view-controls">
+						<button class="button is-small is-dark" v-on:click="resetView">reset</button>
+						<select v-model="selected">
+							<option selected>top</option>
+							<option>right</option>
+							<option>3/4</option>
+						</select>
+					</p>
+
+					<div class="level tracking-controls">
+                        <button class="button is-dark" v-bind:class="{'is-loading': tracking == 4}"
+							disabled="{{!isConnected || tracking == 4}}" v-on:click="reset">reset</button>
+						<p class="pose">
+							<b>TRACK:</b>
+							<b class="tracking" v-bind:class="trackingText">{{trackingText}}</b>
+							<b>{{pose.x.toFixed(2)}},</b><b>{{pose.y.toFixed(2)}},</b><b>{{pose.z.toFixed(2)}}</b>
+						</p>
+					</div>
+				</div>
+				<div class="level">
+					<span>Server: {{wsurl? wsurl : 'Disconnected'}}</span>
+                    <button class="button is-danger" id="tButtonName" v-on:click="check">Pause</button>
+				</div>
+			</div>
+
+
+			<!-- Stats column -->
+			<div class="column">
+				<div class="stats">
+					<div class="stats1">input</div>
+					<div class="stats2">tracking</div>
+				</div>
+				<hr />
+				<div>
+				<p class="control">
+				<label class="checkbox">
+					<!--<input type="checkbox" v-model:checked="fisheyeEnabled">-->
+					Fisheye
+				</label>
+				</p>
+					<canvas id="fisheye-canvas" width=320 height=240></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal is-active" id="modal">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+				<div class="box">
+					<div class="content has-text-centered">
+					<h1 class=""><a class="button is-white is-loading">Loading</a> Loading ... </h1>
+					</div>
+				</div>
+		</div>
+		<button class="modal-close" onclick="document.querySelector('#modal').classList.toggle('is-active')"></button>
+	</div>
+
+	<script src="js/third_party/Stats.js"></script>
+	<script src="js/third_party/jpg.js"></script>
+	<script src="js/third_party/three.js"></script>
+	<script src="js/TrajectoryLine.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/util.js"></script>
+	<script src="js/slam.js"></script>
+	<script src="js/buffer_view.js"></script>
+	<script src="js/occupancy_map.js"></script>
+	<script src="js/transport.js"></script>
+	<script src="js/pose_view.js"></script>
+</body>
+</html>

@@ -6,85 +6,88 @@
 
 #include <librealsense/rs.hpp>
 #include "rs_sdk.h"
-
-#include "camera_utils.h"
-#include "console_view.h"
+#include "version.h"
+#include "pt_utils.hpp"
+#include "pt_console_display.hpp"
 
 using namespace std;
 
-bool play = true;
-void my_handler(int s)
-{
-    if (play)
-    {
-        play = false;
-    }
-    else
-    {
-        exit(1);
-    }
-}
+// Version number of the samples
+extern constexpr auto rs_sample_version = concat("VERSION: ",RS_SAMPLE_VERSION_STR);
 
 int main(int argc, char** argv)
 {
-    // handle ctrl-c
-    struct sigaction sigIntHandler;
 
-    sigIntHandler.sa_handler = my_handler;
-    sigemptyset(&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-
-    sigaction(SIGINT, &sigIntHandler, NULL);
-
-    camera_utils cu;
-    Console_View console_view;
+    pt_utils pt_utils;
+    unique_ptr<console_display::pt_console_display> console_view = move(console_display::make_console_pt_display());
 
     rs::core::video_module_interface::actual_module_config actualModuleConfig;
     rs::person_tracking::person_tracking_video_module_interface* ptModule = nullptr;
 
-    //Init camera and person tracking modules
-    if(cu.init_camera(actualModuleConfig) != rs::core::status_no_error)
+
+    // Initializing Camera and Person Tracking modules
+    if(pt_utils.init_camera(actualModuleConfig) != rs::core::status_no_error)
     {
-        cerr<<"error : device is null" << endl;
+        cerr << "Error: Device is null." << endl << "Please connect a RealSense device and restart the application" << endl;
         return -1;
     }
-    cu.init_person_tracking(&ptModule);
+    pt_utils.init_person_tracking(&ptModule);
 
-    cout << "Enabling Pointing gesture" <<endl;
-    ptModule->QueryConfiguration()->QueryTracking()->Enable();
-    ptModule->QueryConfiguration()->QueryTracking()->SetTrackingMode((Intel::RealSense::PersonTracking::PersonTrackingConfiguration::TrackingConfiguration::TrackingMode)1);
+    // Enable Pointing Gesture
     ptModule->QueryConfiguration()->QueryGestures()->Enable();
     ptModule->QueryConfiguration()->QueryGestures()->EnableAllGestures();
+    ptModule->QueryConfiguration()->QueryTracking()->Enable();
 
-    // set the enabled module configuration
+    // Configure enabled Pointing Gesture
     if(ptModule->set_module_config(actualModuleConfig) != rs::core::status_no_error)
     {
-        cerr<<"error : failed to set the enabled module configuration" << endl;
+        cerr<<"Error : Failed to configure the enabled Pointing Gesture" << endl;
         return -1;
     }
 
-    rs::core::correlated_sample_set sampleSet;
-    while(play)
+    // Start the camera
+    pt_utils.start_camera();
+
+    cout << endl << "-------- Press Esc key to exit --------" << endl << endl;
+
+    while(!pt_utils.user_request_exit())
     {
-        //Get next frame
-        if (cu.GetNextFrame(sampleSet) != 0)
+        rs::core::correlated_sample_set sampleSet = {};
+
+        // Get next frame
+        if (pt_utils.GetNextFrame(sampleSet) != 0)
         {
-            cerr << "error: invalid frame" << endl;
+            cerr << "Error: Invalid frame" << endl;
             continue;
         }
 
-        //process frame
-        if (ptModule->process_sample_set_sync(&sampleSet) != rs::core::status_no_error)
+        // Process frame
+        if (ptModule->process_sample_set(sampleSet) != rs::core::status_no_error)
         {
-            cerr << "error : failed to process sample" << endl;
+            cerr << "Error : Failed to process sample" << endl;
             continue;
         }
 
-        //Print numer of persons in the current frame as well as cumulative total
-        console_view.print_pointing_gesture_info(ptModule);
+
+        // Start tracking the first person detected in the frame
+        console_view->set_tracking(ptModule);
+
+        // Print gesture information
+        // Color coordinates and world coordinates for both gesture origin and direction.
+        console_view->on_person_pointing_gesture_info_update(ptModule);
+
+        // Display color image
+        auto colorImage = sampleSet[rs::core::stream_type::color];
+        console_view->render_color_frames(colorImage);
+
+        // Release color and depth image
+        sampleSet.images[static_cast<uint8_t>(rs::core::stream_type::color)]->release();
+        sampleSet.images[static_cast<uint8_t>(rs::core::stream_type::depth)]->release();
+
     }
 
-    cu.stop_camera();
-    cout << "exiting" << endl;
+    pt_utils.stop_camera();
+    actualModuleConfig.projection->release();
+    cout << "-------- Stopping --------" << endl;
+    return 0;
 }
-

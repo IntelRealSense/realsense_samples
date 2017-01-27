@@ -1,0 +1,288 @@
+<!-- License: Apache 2.0. See LICENSE file in root directory.
+     Copyright(c) 2016 Intel Corporation. All Rights Reserved. -->
+<!doctype html>
+<html>
+
+<head>
+	<meta charset=utf-8>
+	<title>SLAM</title>
+	<style>
+		#poseview {
+			margin-top: 1em;
+		}
+		#fisheye-canvas {
+			width: 320px;
+			height: 240px;
+		}
+		#container {
+			position:relative;
+		}
+		.canvas {
+			positions: absolute;
+			top: 0;
+			left: 0;
+		}
+
+		#color-canvas, #color-2d-overlay {
+			position: absolute;		<!-- Absolute so we can force both canvases to same location -->
+			top: 0px;
+			left: 0px;
+		}
+
+		#color-canvas{
+			z-index: 0;
+		}
+
+		#color-2d-overlay {
+			z-index: 1;
+		}
+
+                .content {
+                        color:#2B60DE;
+                        font-size:60px;
+                        font-weight:bold;
+                        font-style:italic;
+                        font-family: Arial Black, Times New Roman;
+                        text-align: center;
+                }
+		th, td {
+		padding: 5px;
+		text-align: left;
+	}
+
+		.column.main {
+			width: 700px;
+		}
+		.view-controls {
+			position: absolute;
+			z-index: 1000;
+			top: 1em;
+			right: 10px;
+		}
+		.tracking-controls {
+			width: 100%;
+			position: absolute;
+			bottom: 0;
+			padding: 10pt 10pt;
+		}
+		.pose {
+			font-size: 80%;
+		}
+
+		.pose > b {
+			/*border: 1px solid red;*/
+			display: inline-block;
+			width: 3.5em;
+			margin-left: 6pt;
+			overflow: hidden;
+			text-align: right;
+		}
+		.pose > .tracking {
+			width: 5em
+		}
+		.tracking.na {
+			color: rgba(0,0,0,0.5);
+		}
+		.tracking.fail {
+			color: #d32f2f;
+		}
+		.tracking.low {
+			color: #FFA000;
+		}
+		.tracking.medium {
+			color: #AFB42B;
+		}
+		.tracking.high {
+			color: #388E3C;
+		}
+
+	table {
+		border: 1px solid black;
+		border-collapse: collapse;
+		table-layout: fixed;
+		empty-cells: show;
+	}
+	th, td {
+		border: 1px solid black;
+		padding: 4px;
+	}
+        /* SCROLL TABLE ESSENTIALS (+ SOME ADDITIONAL CSS): */
+	div#scrollTableContainer {
+		width: 600px;
+		border: 1px solid black;
+	}
+	.touchScreen div#scrollTableContainer {
+		width: 583px; /* touch devices do not form scrollbars (= 17 px wide) */
+	}
+	#tHeadContainer {
+		background: #3b9cf8;
+		color: white;
+		font-weight: bold;
+	}
+	#tBodyContainer {
+		height: 240px;
+		overflow-y: scroll;
+	}
+	.touchScreen #tBodyContainer {
+		-webkit-overflow-scrolling: touch; /* smooths scrolling on touch screens */
+	}
+        /* FINER LAYOUT DETAILS */
+	tr:first-child td {
+		border-top: 0px;
+	}
+	#tBody tr.lastRow td {
+		border-bottom: 0px;
+		}
+
+
+	th:first-child, td:first-child {
+			width: 100px;
+		border-left: 0px;
+	}
+	th:first-child + td, td:first-child + td {
+			width: 150px;
+	}
+	th:first-child + td + td, td:first-child + td + td {
+			width: 220px;
+	}
+	th:first-child + td + td + td, td:first-child + td + td + td {
+		border-right: 0px;
+	}
+
+        /* AND SOME CSS TO INFORM TOUCH SCREEN USERS: */
+	p#touchDeviceText {
+		display: none;
+	}
+	.touchScreen p#touchDeviceText {
+		display: block;
+	}
+
+		.column_right, .column_left {
+			width: 640px;
+			min-width: 640px;
+			min-height: 480px;
+		margin: 20px; /* just for presentation purposes */
+		padding: 0;
+		}
+		.controls {
+			position: relative;
+	/*		float:left; */
+		}
+		.level {
+			position: relative;
+			top: -56px;
+			width: 100%;
+		}
+
+	</style>
+	<link rel="stylesheet" href="css/bulma.css" />
+	<script src="js/third_party/vue.js"></script>
+</head>
+
+<body>
+	<div class="container" id="poseview">
+		<div class="columns">
+
+			<!-- Main canvas -->
+			<div class="column main">
+				<div class="controls">
+					<canvas id="tracking-canvas" width=600 height=500></canvas>
+
+					<p class="view-controls">
+						<select v-model="selected">
+							<option selected>top</option>
+							<option>right</option>
+							<option>3/4</option>
+						</select>
+					</p>
+
+					<div class="level tracking-controls">
+						<button class="button is-dark" v-bind:class="{'is-loading': tracking == 4}"
+							disabled="{{!isConnected || tracking == 4}}" v-on:click="reset">reset</button>
+						<p class="pose">
+							<b>TRACK:</b>
+							<b class="tracking" v-bind:class="trackingText">{{trackingText}}</b>
+							<b>{{pose.x.toFixed(2)}},</b><b>{{pose.y.toFixed(2)}},</b><b>{{pose.z.toFixed(2)}}</b>
+						</p>
+					</div>
+				</div>
+				<div class="level">
+					<span>Server: {{wsurl? wsurl : 'Disconnected'}}</span>
+					<button class="button is-danger" id="tButtonName" v-on:click="check">Resume</button>
+				</div>
+				<div id="scrollTableContainer">
+					<div id="tHeadContainer">
+						<table id="tHead">
+							<tr>
+								<th>Time Stamp</th>
+								<th>Label or Person&nbsp;ID</th>
+								<th>World Co-ordinates (x,&nbsp;y,&nbsp;z)</th>
+								<th>Confidence %</th>
+							</tr>
+						</table>
+					</div> <!-- tHeadContainer -->
+					<div id="tBodyContainer">
+						<table id="tBody">
+						<!-- table rows will go here -->
+						</table>
+					</div> <!-- tBodyContainer -->
+				</div> <!-- scrollTableContainer -->
+			</div>
+
+
+			<!-- Stats column -->
+			<div class="column">
+				<div class="stats">
+					<div class="stats1">input</div>
+					<div class="stats2">tracking</div>
+				</div>
+				<hr />
+				<div>
+					<p class="control">
+					<label class="checkbox">
+						<!--<input type="checkbox" v-model:checked="fisheyeEnabled">-->
+						Fisheye
+					</label>
+					</p>
+						<canvas id="fisheye-canvas" width=320 height=240></canvas>
+				</div>
+				<div style="width:320; min-height:300;">
+					<p class="control">
+					<label class="checkbox">
+						<!--<input type="checkbox" v-model:checked="colorEnabled">-->
+						Color
+					</label>
+					</p>
+					<div style="position: relative;">
+						<canvas id="color-canvas" width=320 height=240></canvas>
+						<canvas id="color-2d-overlay" width=320 height=240></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+        <div class="modal is-active" id="modal">
+            <div class="modal-background"></div>
+            <div class="modal-content">
+                 <div class="box">
+                      <div class="content">
+                           <p> Loading ... </p>
+                      </div>
+                 </div>
+            </div>
+
+        </div>
+
+	<script src="js/third_party/Stats.js"></script>
+	<script src="js/third_party/jpg.js"></script>
+	<script src="js/third_party/three.js"></script>
+	<script src="js/third_party/TrackballControls.js"></script>
+	<script src="js/util.js"></script>
+    <script src="js/object_recognition.js"></script>
+	<script src="js/slam.js"></script>
+	<script src="js/buffer_view.js"></script>
+	<script src="js/occupancy_map.js"></script>
+	<script src="js/transport.js"></script>
+	<script src="js/pose_view.js"></script>
+</body>
+</html>

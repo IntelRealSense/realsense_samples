@@ -1,11 +1,11 @@
 # or_tutorial_1
 
-This console app illustrates the use of libRealSense, libOR, and the Linux SDK Framework to use the RealSense camera's depth and color sensors to identify objects in the scene. Each object identified will be printed on the command line along with the confidence value for the object, for objects which take up ~50% of the screen for recognition
+This console app illustrates the use of Intel® RealSense™ Cross Platform API, Object Library, and the Linux SDK Framework to use the ZR300 camera's depth and color sensors to identify objects in the scene. Each object identified will be printed on the command line, and (for recognition) the confidence value for the object, for objects which take up ~50% of the screen.
 
 # Sample output
 
 
-When running or_tuturial_1 sample, the object recognition result will be printed  on console continuously with objects' label and recognition confidence value:
+When running or_tutorial_1 sample, the object recognition result will be printed on the console continuously with the object's label and recognition confidence value:
 
 ```
 Label             Confidence
@@ -17,9 +17,19 @@ Label             Confidence
 Monitor            0.86
 ```
 
+# Steps to execute
+
+Type the following command at the command prompt to execute this sample:
+
+```bash
+$ rs_or_tutorial_1
+```
+**Note:** If you are building this sample from source, the executable name is, instead, sample_or_tutorial_1.
+
+
 #License
 
-Copyright 2016 Intel Corporation
+Copyright 2017 Intel Corporation
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project except in compliance with the License. You may obtain a copy of the License at
 

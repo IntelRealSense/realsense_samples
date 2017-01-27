@@ -1,0 +1,6 @@
+{
+  "undef": false,
+  "unused": true,
+  "esversion": 6,
+  "predef": [ "THREE" ]
+}
