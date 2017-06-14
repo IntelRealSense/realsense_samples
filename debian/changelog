@@ -1,5 +1,5 @@
-librealsense-samples (0.6.5-1) unstable; urgency=medium
+librealsense-samples (0.6.6-1) unstable; urgency=medium
 
   * Beta4 Release 
 
- -- RealSense <realsense-sw@intel.com>  Thu, 26 Jan 2017 09:41:36 +0800
+ -- RealSense <realsense-sw@intel.com>  Fri, 24 Mar 2017 09:41:36 +0800

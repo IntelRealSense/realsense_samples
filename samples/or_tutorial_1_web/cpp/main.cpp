@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 #include <thread>
 #include <librealsense/rs.hpp>
@@ -101,6 +101,8 @@ int main(int argc,char* argv[])
     int height = colorInfo.height;
     // Recognize the objects which take up ~50% of the screen
     or_configuration->set_roi(rs::core::rect{(width/4), (height/4), (width/2), (height/2)});
+    // Enable GPU computing
+    or_configuration->set_compute_engine(rs::object_recognition::compute_engine::GPU);
 
     status = or_configuration->apply_changes();
     if (status != rs::core::status_no_error)

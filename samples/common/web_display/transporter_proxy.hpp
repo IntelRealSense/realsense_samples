@@ -1,9 +1,9 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 #pragma once
 
-#include <jsoncpp/json/json.h>
+#include <json/json.hpp>
 #include <cmath>
 #include <opencv2/opencv.hpp>
 
@@ -14,6 +14,7 @@
 using namespace std;
 using namespace transport;
 using namespace cv;
+using nlohmann::json;
 
 enum MsgType : uint8_t
 {
@@ -88,9 +89,9 @@ public:
         transporter->disconnect();
     }
 
-    void send_json_data(Json::Value msg)
+    void send_json_data(json msg)
     {
-        transporter->send_data_string(json_writer.write(msg));
+        transporter->send_data_string(msg.dump());//Dump converts JSON object to string format
     }
 
     void set_control_callbacks(display_controls controls)
@@ -121,40 +122,35 @@ public:
 
     void on_data_string(Transporter& net, std::string&& str)
     {
-        Json::Value root;
-        // check if json
-        if (json_reader.parse(str, root, false))
+        json root = json::parse(str);
+        
+        string type = root["type"];
+        string command = root["command"];
+        std::cout << "Data Received: " << str << std::endl;
+
+        if (type == "control")
         {
-            // reset message:
-            string&& type = root["type"].asString();
-            if (type == "control")
+            if (command == "reset")
             {
-                string&& command = root["command"].asString();
-                if (command == "reset")
-                {
-                    cout << "server: received reset message" << endl;
-                    control_callbacks.reset();
-                    return;
-                }
-                else if (command == "load_pt_db")
-                {
-                    cout << "server: received load_db message" << endl;
-                    control_callbacks.loading_rid_db();
-                    return;
-                }
-            }
-            else if (type =="pt_track")
-            {
-                string&& command = root["command"].asString();
-               // cout << TAG << "on_data_string: received request to track person " << command << endl;
-                control_callbacks.track(command);
+                cout << "server: received reset message" << endl;
+                control_callbacks.reset();
                 return;
             }
-            cout << TAG << "recieved unhandled valid JSON: \n<<< " << str << " >>>" << endl;
+            else if (command == "load_pt_db")
+            {
+                cout << "server: received load_db message" << endl;
+                control_callbacks.loading_rid_db();
+                return;
+            }
+        }
+        else if (type =="pt_track")
+        {
+            control_callbacks.track(command);
+            return;
         }
         else
         {
-            cout << TAG << "received non-JSON string: '" << str << "'" << endl;
+            cout << TAG << "received unhandled string: '" << str << "'" << endl;
         }
     }
 
@@ -320,9 +316,6 @@ private:
     atomic_int unacked_messages[MaxType];
     const int kMaxUnackedFishEye = 3;
     const int kMaxUnackedMapUpdate = 3;
-
-    Json::FastWriter json_writer;
-    Json::Reader json_reader;
 
     uint64_t last_ts;
     uint64_t rgb_last_ts;

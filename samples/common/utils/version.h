@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 #include <array>
 
@@ -8,7 +8,7 @@
 
 #define RS_SAMPLE_MAJOR_VERSION    0
 #define RS_SAMPLE_MINOR_VERSION    6
-#define RS_SAMPLE_PATCH_VERSION    5
+#define RS_SAMPLE_PATCH_VERSION    6
 #define RS_SAMPLE_VERSION  (((RS_SAMPLE_MAJOR_VERSION) * 10000) + ((RS_SAMPLE_MINOR_VERSION) * 100) + (RS_SAMPLE_PATCH_VERSION))
 #define RS_SAMPLE_VERSION_STR (VAR_ARG_STRING(RS_SAMPLE_MAJOR_VERSION.RS_SAMPLE_MINOR_VERSION.RS_SAMPLE_PATCH_VERSION))
 

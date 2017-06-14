@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 #pragma once
 
@@ -11,7 +11,7 @@
 #include <map>
 #include <sys/stat.h>
 
-#include <jsoncpp/json/json.h>
+#include <json/json.hpp>
 #include <opencv2/opencv.hpp>
 
 #include "person_tracking_video_module_factory.h"
@@ -21,6 +21,7 @@
 using namespace std;
 using namespace rs::person_tracking;
 using namespace Intel::RealSense::PersonTracking;
+using nlohmann::json;
 
 namespace web_display
 {
@@ -42,7 +43,7 @@ public:
 
     void on_pt_update(uchar* pose_data, rs::person_tracking::person_tracking_video_module_interface* ptModule)
     {
-        Json::Value value(Json::objectValue);
+        json value;
         if(ConstructPTJson(pose_data, ptModule, value))
         {
             m_transporter_proxy->send_json_data(value);
@@ -86,10 +87,10 @@ public:
 private:
     transporter_proxy *m_transporter_proxy;
 
-    Json::Value ConstructPtTrackingJson(
+    json ConstructPtTrackingJson(
         person_tracking_video_module_interface *ptModule, int cumulative_total)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
         Intel::RealSense::PersonTracking::PersonTrackingData *trackingData = ptModule->QueryOutput();
 
         for (int index = 0; index < trackingData->QueryNumberOfPeople(); index++)
@@ -107,7 +108,7 @@ private:
                 int id = personTrackingData->QueryId();
 
                 // Construct json
-                Json::Value value(Json::objectValue);
+                json value;
                 // person id
                 value["pid"] = id;
 
@@ -148,13 +149,13 @@ private:
                      }
                  }
                 // Put json obj to the json list
-                obj_list_json.append(value);
+                obj_list_json += value;
             }
         }
 
         if (trackingData->QueryNumberOfPeople())
         {
-            Json::Value result_json(Json::objectValue);
+            json result_json;
             result_json["Object_result"] = obj_list_json;
             result_json["type"] = "person_tracking";
 
@@ -164,10 +165,10 @@ private:
         return obj_list_json;
     }
 
-    Json::Value ConstructPtHeadPosePersonOrientationJson(
+    json ConstructPtHeadPosePersonOrientationJson(
         person_tracking_video_module_interface *ptModule)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
         Intel::RealSense::PersonTracking::PersonTrackingData *trackingData = ptModule->QueryOutput();
 
         if (trackingData->QueryNumberOfPeople() > 0)
@@ -181,7 +182,7 @@ private:
                 Intel::RealSense::PersonTracking::PersonTrackingData::PoseEulerAngles headAngles;
                 auto headBoundingBox = personData->QueryTracking()->QueryHeadBoundingBox();
                 // Construct json
-                Json::Value value(Json::objectValue);
+                json value;
 
                 // person id
                 value["pid"] = personData->QueryTracking()->QueryId();
@@ -203,10 +204,10 @@ private:
 
 
                 // Put json obj to the json list
-                obj_list_json.append(value);
+                obj_list_json += value;
             }
 
-            Json::Value result_json(Json::objectValue);
+            json result_json;
             result_json["Object_result"] = obj_list_json;
             result_json["type"] = "person_tracking";
 
@@ -217,10 +218,10 @@ private:
 
     }
 
-    Json::Value ConstructPtPointingGestureJson(
+    json ConstructPtPointingGestureJson(
         person_tracking_video_module_interface *ptModule)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
         Intel::RealSense::PersonTracking::PersonTrackingData *trackingData = ptModule->QueryOutput();
 
         if (trackingData->QueryNumberOfPeople() > 0)
@@ -235,7 +236,7 @@ private:
                 Intel::RealSense::PersonTracking::PersonTrackingData::BoundingBox2D box = personData->QueryTracking()->Query2DBoundingBox();
 
                 // Construct json
-                Json::Value value(Json::objectValue);
+                json value;
 
                 value["pid"] = personData->QueryTracking()->QueryId();
 
@@ -265,10 +266,10 @@ private:
                 }
 
                 // Put json obj to the json list
-                obj_list_json.append(value);
+                obj_list_json += value;
             }
 
-            Json::Value result_json(Json::objectValue);
+            json result_json;
             result_json["Object_result"] = obj_list_json;
             result_json["type"] = "person_tracking";
 
@@ -280,9 +281,9 @@ private:
 
     bool ConstructPTJson(uchar* pose_data,
                          person_tracking_video_module_interface *ptModule,
-                         Json::Value &result_json)
+                         json &result_json)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
 
         Intel::RealSense::PersonTracking::PersonTrackingData *trackingData = ptModule->QueryOutput();
 
@@ -308,7 +309,7 @@ private:
                                                    centerMass.world.point.z);
 
                 // Construct json
-                Json::Value value(Json::objectValue);
+                json value;
 
                 // Filter out exist person data
                 if (!filter_person_based_on_pose(actual_pose))
@@ -319,10 +320,10 @@ private:
                     pt_pose[2] = actual_pose.z;
 
                     //pose
-                    Json::Value &p = value["pose"];
+                    json &p = value["pose"];
                     for (int i = 0; i < 3; i++)
                     {
-                        p.append(pt_pose[i]);
+                        p += pt_pose[i];
                     }
                 }
 
@@ -343,7 +344,7 @@ private:
                 value["center_mass_world"]["z"] = centerMass.world.point.z;
 
                 //put json obj to the json list
-                obj_list_json.append(value);
+                obj_list_json += value;
             }
 
         }

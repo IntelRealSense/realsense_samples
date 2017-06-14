@@ -1,7 +1,7 @@
 Source: librealsense-samples
 Priority: optional
 Maintainer: Intel RealSense <realsense-sw@intel.com>
-Build-Depends: debhelper (>=9), cmake (>= 2.8), libopencv-dev (>=3.1), libjpeg-dev, librealsense-dev (>=1.12.1), librealsense-sdk-dev (>=0.7.1), librealsense-persontracking-dev (>=0.5.10), librealsense-object-recognition-dev, librealsense-slam-dev (>=2.0.4)
+Build-Depends: debhelper (>=9), cmake (>= 2.8), beignet-opencl-icd (>=1.1.1-2), libopencv-dev (>=3.1), libjpeg-dev, librealsense-dev (>=1.12.1), librealsense-sdk-dev (>=0.7.1), librealsense-persontracking-dev (>=0.5.10), librealsense-object-recognition-dev, librealsense-slam-dev (>=2.0.4)
 Standards-Version: 3.9.6
 Section: libs
 Homepage: https://github.com/IntelRealSense/realsense_samples

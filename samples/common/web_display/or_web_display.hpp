@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 #pragma once
 
@@ -8,7 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sys/stat.h>
-#include <jsoncpp/json/json.h>
+#include <json/json.hpp>
 
 #include "or_data_interface.h"
 #include "or_configuration_interface.h"
@@ -19,6 +19,7 @@ using namespace std;
 using namespace cv;
 using namespace rs::core;
 using namespace rs::object_recognition;
+using nlohmann::json;
 
 namespace web_display
 {
@@ -46,7 +47,7 @@ public:
     {
         if (array_size == 0 || !localization_data) return;
 
-        Json::Value filter_OR_data = construct_or_json(pose_data, localization_data, array_size, or_configuration,
+        json filter_OR_data = construct_or_json(pose_data, localization_data, array_size, or_configuration,
                                      true);
         m_transporter_proxy->send_json_data(filter_OR_data);
 
@@ -58,11 +59,11 @@ public:
 
     void on_object_list(vector<string> obj_name_list)
     {
-        Json::Value result_json(Json::objectValue);
-        Json::Value &l = result_json["list"];
+        json result_json;
+        json &l = result_json["list"];
         for (unsigned int i = 0; i < obj_name_list.size(); i++)
         {
-            l.append(obj_name_list[i]);
+            l += obj_name_list[i];
         }
         result_json["type"] = "object_recognition_label_list";
 
@@ -114,12 +115,12 @@ public:
 private:
     transporter_proxy *m_transporter_proxy;
 
-    Json::Value construct_or_json(uchar* pose_data,
+    json construct_or_json(uchar* pose_data,
                                   rs::object_recognition::localization_data *localization_data, int array_size,
                                   rs::object_recognition::or_configuration_interface *or_configuration,
                                   bool needFilter)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
         for (int i = 0; i < array_size; i++)
         {
             string objName = or_configuration->query_object_name_by_id(localization_data[i].label);
@@ -149,29 +150,29 @@ private:
             or_pose[2] = actual_pose.z;
 
             // Construct json
-            Json::Value value(Json::objectValue);
+            json value;
             //label and confidence
             value["label"] = objName;
             value["confidence"] = confidence;
 
             // pose
-            Json::Value &p = value["pose"];
+            json &p = value["pose"];
             for (int i = 0; i < 3; i++)
             {
-                p.append(or_pose[i]);
+                p += or_pose[i];
             }
 
-            Json::Value &r = value["rectangle"];
-            r.append(rect.x);
-            r.append(rect.y);
-            r.append(rect.width);
-            r.append(rect.height);
+            json &r = value["rectangle"];
+            r += rect.x;
+            r += rect.y;
+            r += rect.width;
+            r += rect.height;
 
             // Put json obj to the json list
-            obj_list_json.append(value);
+            obj_list_json += value;
         }
 
-        Json::Value result_json(Json::objectValue);
+        json result_json;
         result_json["Object_result"] = obj_list_json;
         if (needFilter)
         {
@@ -185,10 +186,10 @@ private:
         return result_json;
     }
 
-    Json::Value construct_localization_json(rs::object_recognition::localization_data *localization_data,
+    json construct_localization_json(rs::object_recognition::localization_data *localization_data,
                                             int array_size, or_configuration_interface *or_configuration)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
         for (int i = 0; i < array_size; i++)
         {
             string objName = or_configuration->query_object_name_by_id(localization_data[i].label);
@@ -201,31 +202,31 @@ private:
             center_coord[2] = localization_data[i].object_center.coordinates.z;
 
             // Construct json
-            Json::Value value(Json::objectValue);
+            json value;
 
             // Label and confidence
             value["label"] = objName;
             value["confidence"] = confidence;
 
             // Pose
-            Json::Value &p = value["centerCoord"];
+            json &p = value["centerCoord"];
             for (int i = 0; i < 3; i++)
             {
-                p.append(center_coord[i]);
+                p += center_coord[i];
             }
 
-            Json::Value &r = value["rectangle"];
-            r.append(rect.x);
-            r.append(rect.y);
-            r.append(rect.width);
-            r.append(rect.height);
+            json &r = value["rectangle"];
+            r += rect.x;
+            r += rect.y;
+            r += rect.width;
+            r += rect.height;
 
             // Put json obj to the json list
-            obj_list_json.append(value);
+            obj_list_json += value;
 
         }
 
-        Json::Value result_json(Json::objectValue);
+        json result_json;
 
         if (array_size == 0)
         {
@@ -240,40 +241,40 @@ private:
         return result_json;
     }
 
-    Json::Value construct_recognition_json(recognition_data *recognition_data,
+    json construct_recognition_json(recognition_data *recognition_data,
                                            int array_size, or_configuration_interface *or_configuration)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
         std::string objName = or_configuration->query_object_name_by_id(
                                   recognition_data[0].label);
         float confidence = recognition_data[0].probability;
 
         //Construct json
-        Json::Value value(Json::objectValue);
+        json value;
 
         // Label and Confidence
         value["label"] = objName;
         value["confidence"] = confidence;
 
         // Put json obj to the json list
-        obj_list_json.append(value);
+        obj_list_json += value;
 
-        Json::Value result_json(Json::objectValue);
+        json result_json;
         result_json["Object_result"] = obj_list_json;
         result_json["type"] = "object_recognition";
 
         return result_json;
     }
 
-    Json::Value construct_tracking_json(localization_data *localization_data,
+    json construct_tracking_json(localization_data *localization_data,
                                         tracking_data *tracking_data,
                                         or_configuration_interface *or_configuration,
                                         int array_size, bool is_localize, vector<string> &objects_names)
     {
-        Json::Value obj_list_json(Json::arrayValue);
+        json obj_list_json;
 
         // Construct json
-        Json::Value result_json(Json::objectValue);
+        json result_json;
 
         if (is_localize)
         {
@@ -290,27 +291,27 @@ private:
                 center_coord[2] = localization_data[i].object_center.coordinates.z;
 
                 // Construct json
-                Json::Value value(Json::objectValue);
+                json value;
 
                 // Label and confidence
                 value["label"] = objName;
                 value["confidence"] = confidence;
 
                 // Pose
-                Json::Value &p = value["centerCoord"];
+                json &p = value["centerCoord"];
                 for (int i = 0; i < 3; i++)
                 {
-                    p.append(center_coord[i]);
+                    p += center_coord[i];
                 }
 
-                Json::Value &r = value["rectangle"];
-                r.append(rect.x);
-                r.append(rect.y);
-                r.append(rect.width);
-                r.append(rect.height);
+                json &r = value["rectangle"];
+                r += rect.x;
+                r += rect.y;
+                r += rect.width;
+                r += rect.height;
 
                 // Put json obj to the json list
-                obj_list_json.append(value);
+                obj_list_json += value;
             }
             result_json["type"] = "object_localization";
         }
@@ -319,17 +320,17 @@ private:
             for (int i = 0; i < array_size; i++)
             {
                 // Construct json
-                Json::Value value(Json::objectValue);
+                json value;
                 string objName = objects_names[i];
 
                 value["label"] = objName;
-                Json::Value &r = value["rectangle"];
-                r.append(tracking_data[i].roi.x);
-                r.append(tracking_data[i].roi.y);
-                r.append(tracking_data[i].roi.width);
-                r.append(tracking_data[i].roi.height);
+                json &r = value["rectangle"];
+                r += tracking_data[i].roi.x;
+                r += tracking_data[i].roi.y;
+                r += tracking_data[i].roi.width;
+                r += tracking_data[i].roi.height;
                 // Put json obj to the json list
-                obj_list_json.append(value);
+                obj_list_json += value;
             }
             cout << endl;
             result_json["type"] = "object_tracking";

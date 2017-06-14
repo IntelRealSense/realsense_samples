@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 const ViewStatus = {
     DISCONNECTED: 0,
@@ -57,7 +57,8 @@ let view = new Vue({
             }
         },
         loadDB: () => {
-            transporter.sendMessage({ type: "control", command: "load_pt_db" });
+            transporter.sendMessage({ "type": "control", "command": "load_pt_db" });
+            //transporter.sendMessage({ type: "control", command: "load_pt_db" });
         },
         stop: () => {
             transporter.close();
@@ -359,7 +360,8 @@ function onOverlayCanvasClick(e)
                 {
                     // Send message back through web socket to the C++ code saying to focus on this person
                     console.log("Clicked-on person has ID = " + pt_object.pid);
-                    transporter.sendMessage({ type: "pt_track", command: pt_object.pid });
+                    //transporter.sendMessage({ type: "pt_track", command: pt_object.pid });
+                    transporter.sendMessage({ "type": "pt_track", "command": '"'+pt_object.pid+'"' });
                     return;	// Found clicked-on person, sent message back to server.  We're done.
                 }
             }
@@ -368,7 +370,8 @@ function onOverlayCanvasClick(e)
 
     // The click didn't hit anybody, so send message back through web socket to the C++ code saying to focus on nobody
     console.log("Clicked-on NO person, so telling server to stop focusing on all people");
-    transporter.sendMessage({ type: "pt_track", command: "-1" });
+    transporter.sendMessage({ "type": "pt_track", "command": "-1" });
+    //transporter.sendMessage({ type: "pt_track", command: "-1" });
 }
 
 

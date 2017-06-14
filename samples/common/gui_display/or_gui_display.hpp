@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 #pragma once
 
@@ -492,7 +492,10 @@ public:
 
         for (int i = 0; i< arraySize; i++)
         {
-            this->draw_rect_no_text(cv::Point(trackingData[i].roi.x, trackingData[i].roi.y),trackingData[i].roi.width, trackingData[i].roi.height,i);
+            cv::String title = get_3D_location_string(trackingData[i].object_center.coordinates);
+            this->draw_rect(title, i,
+                            trackingData[i].roi.x,trackingData[i].roi.y,
+                            trackingData[i].roi.width, trackingData[i].roi.height);
         }
 
         return true;

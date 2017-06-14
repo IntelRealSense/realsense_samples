@@ -11,12 +11,10 @@ find_library(JPEG_TURBO NAMES libturbojpeg.a jpeg HINTS /usr/lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
     /usr/include
     /usr/include/librealsense
-    ${CMAKE_CURRENT_SOURCE_DIR}/jsoncpp
     ${CMAKE_CURRENT_SOURCE_DIR}/transporter
     )
 
-add_library(${PROJECT_NAME} STATIC
-    jsoncpp/jsoncpp.cpp)
+add_library(${PROJECT_NAME} STATIC)
 
 set(RS_SDK_LIBRARIES realsense_projection realsense_image)
 

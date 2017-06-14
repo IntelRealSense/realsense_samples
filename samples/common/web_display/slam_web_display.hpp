@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 
 #pragma once
 
@@ -20,6 +20,7 @@
 using namespace std;
 using namespace rs::core;
 using namespace rs::slam;
+using nlohmann::json;
 
 namespace web_display
 {
@@ -39,7 +40,7 @@ public:
 
     void on_reset_competed()
     {
-        Json::Value msg;
+        json msg;
         msg["type"] = "event";
         msg["event"] = "on_reset_completed";
 
@@ -48,13 +49,13 @@ public:
 
     void on_pose(int tracking, float* pose)
     {
-        Json::Value msg;
+        json msg;
         msg["type"] = "tracking";
         msg["tracking"] = tracking;
-        Json::Value& p = msg["pose"];
+        json& p = msg["pose"];
         for (int i = 0; i < 12; i++)
         {
-            p.append(pose[i]);
+            p += pose[i];
         }
         m_transporter_proxy->send_json_data(msg);
 
@@ -69,7 +70,7 @@ public:
     void on_fps(const char* type, float fisheye, float depth,
                 float accelerometer, float gyroscope)
     {
-        Json::Value msg;
+        json msg;
         msg["type"] = "fps";
         msg["fps"]["type"] = type;
         msg["fps"]["fisheye"] = fisheye;

@@ -6,5 +6,5 @@ set(SAMPLE_PREFIX "sample_")
 endif()
 
 add_definitions( -DINSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}" )
-install(FILES README.md DESTINATION share/doc/librealsense-samples)
+install(FILES README.md Attributions.txt DESTINATION share/doc/librealsense-samples)
 add_subdirectory(samples)

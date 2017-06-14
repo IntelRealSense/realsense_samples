@@ -1,5 +1,5 @@
 // License: Apache 2.0. See LICENSE file in root directory.
-// Copyright(c) 2016 Intel Corporation. All Rights Reserved.
+// Copyright(c) 2017 Intel Corporation. All Rights Reserved.
 const ViewStatus = {
     DISCONNECTED: 0,
     CONNECTING: 1,
@@ -79,7 +79,8 @@ let view = new Vue({
         },
         reset: () => {
             viewModel.tracking = 4;
-            transporter.sendMessage({ type: "control", command: "reset" });
+            //transporter.sendMessage({ type: "control", command: "reset" });
+            transporter.sendMessage({ "type": "control", "command": "reset" });
         }
     }
 });
